@@ -14,7 +14,7 @@ export default function Home() {
 
     try {
       const response = await axios.post(
-        'http://localhost:8000/api/shorten',
+        'https://url-shortener-swop.onrender.com/api/shorten',
         { originalUrl: url, customAlias }
       );
       setShortenedURL(response.data.shortBaseUrl);

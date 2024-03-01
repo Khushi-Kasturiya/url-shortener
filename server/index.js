@@ -1,6 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const ShortUrl = require('/Users/khushi/myCodes/GC Tech/server/models/shortURL');
+const ShortUrl = require('./models/shortURL.js');
 const validUrl = require('valid-url');
 const shortId = require('shortid');
 const QRCode = require('qrcode');

@@ -7,6 +7,8 @@ This project is a simple URL shortener application built using Next.js and TypeS
 - Convert long URLs into short URLs
 - Option to create custom aliases for URLs
 - Copy shortened URL to clipboard functionality
+- Gives an error if the suggested name is already being used.
+- Offers downloadable QR code for easy website access.
 
 ## Prerequisites
 

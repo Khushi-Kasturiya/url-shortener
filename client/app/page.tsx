@@ -8,6 +8,7 @@ export default function Home() {
   const [url, setURL] = useState('');
   const [customAlias, setCustomAlias] = useState('');
   const [shortenedURL, setShortenedURL] = useState('');
+  const [qrCodeDataURL, setQrCodeDataURL] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -17,13 +18,14 @@ export default function Home() {
     try {
       const response = await axios.post(
         'https://url-shortener-swop.onrender.com/api/shorten',
+        // 'http://localhost:8000/api/shorten', for local development
         { originalUrl: url, customAlias }
       );
       setShortenedURL(response.data.shortBaseUrl);
-      // Display success message or handle accordingly.
+      setQrCodeDataURL(response.data.qrCodeDataURL);
 
     } catch (error) {
-      const axiosError = error as AxiosError; 
+      const axiosError = error as AxiosError;
       if (axiosError.response && axiosError.response.status === 409) {
         setShortenedURL('');
         setErrorMessage("Custom alias already exists. Please choose another.");
@@ -61,6 +63,7 @@ export default function Home() {
 
         </form>
 
+      </div>
         {shortenedURL && (
 
           <div className="shortened-url-container">
@@ -77,10 +80,21 @@ export default function Home() {
 
             </CopyToClipboard>
 
+            {qrCodeDataURL && (
+              <>
+                <p>QR Code:</p>
+                <img src={qrCodeDataURL} alt="QR Code" />
+                {/* Download Link */}
+                <a href={qrCodeDataURL} download={`QR_${customAlias || 'link'}.png`}>
+                <button >Download QR Code</button>
+                </a>
+              </>
+            )}
+
           </div>
         )}
 
-      </div>
+      
     </div>
 
   );

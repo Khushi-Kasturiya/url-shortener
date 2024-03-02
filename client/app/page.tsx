@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from 'react';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import './globals.css';
 
@@ -8,9 +8,11 @@ export default function Home() {
   const [url, setURL] = useState('');
   const [customAlias, setCustomAlias] = useState('');
   const [shortenedURL, setShortenedURL] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setErrorMessage('');
 
     try {
       const response = await axios.post(
@@ -21,56 +23,64 @@ export default function Home() {
       // Display success message or handle accordingly.
 
     } catch (error) {
-      console.error((error as Error).message);
+      const axiosError = error as AxiosError; 
+      if (axiosError.response && axiosError.response.status === 409) {
+        setShortenedURL('');
+        setErrorMessage("Custom alias already exists. Please choose another.");
+      } else {
+        console.error(axiosError.message);
+        setErrorMessage("An unexpected error occurred.");
+      }
     }
   };
 
   return (
     <div>
-    <h1 className='pageHeading'>URL Shortener</h1>
-    <div className="container">
+      <h1 className='pageHeading'>URL Shortener</h1>
+      <div className="container">
 
-      <form onSubmit={handleSubmit}>
-        <p>Convert long URLs into shortened versions with a single click.</p>
-        <input
-          type="text"
-          placeholder="Enter URL here.."
-          className="url-input"
-          value={url}
-          onChange={(e) => setURL(e.target.value)}
-          required />
-        <p>Create personalized and memorable links for your URLs (Optional)</p>
-        <input
-          type="text"
-          placeholder="Example: favourite-link"
-          className="alias-input"
-          value={customAlias}
-          onChange={(e) => setCustomAlias(e.target.value)} />
-        <br></br>
-        <button type="submit">Get your Link</button>
+        <form onSubmit={handleSubmit}>
+          <p>Convert long URLs into shortened versions with a single click.</p>
+          <input
+            type="text"
+            placeholder="Enter URL here.."
+            className="url-input"
+            value={url}
+            onChange={(e) => setURL(e.target.value)}
+            required />
+          <p>Create personalized and memorable links for your URLs (Optional)</p>
+          <input
+            type="text"
+            placeholder="Example: favourite-link"
+            className="alias-input"
+            value={customAlias}
+            onChange={(e) => setCustomAlias(e.target.value)} />
+          <br></br>
+          <button type="submit">Get your Link</button>
+          {errorMessage && <p className="error-message">{errorMessage}</p>}
 
-      </form>
+        </form>
 
-      {shortenedURL && (
+        {shortenedURL && (
 
-        <div className="shortened-url-container">
+          <div className="shortened-url-container">
 
-          <p>Shortened URL:</p>
+            <p>Shortened URL:</p>
 
-          <a href={shortenedURL} rel="noopener noreferrer">
-            {shortenedURL}
-          </a>
+            <a href={shortenedURL} rel="noopener noreferrer">
+              {shortenedURL}
+            </a>
 
-          <CopyToClipboard text={shortenedURL}>
+            <CopyToClipboard text={shortenedURL}>
 
-            <button >Copy to Clipboard</button>
+              <button >Copy to Clipboard</button>
 
-          </CopyToClipboard>
+            </CopyToClipboard>
 
-        </div>
-      )}
+          </div>
+        )}
 
-    </div>
+      </div>
     </div>
 
   );

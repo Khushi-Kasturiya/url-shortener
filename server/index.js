@@ -25,6 +25,12 @@ app.post('/api/shorten', async (req, res) => {
     if (validUrl.isUri(originalUrl)) {
         try {
             let urlCode = customAlias ? customAlias : shortId.generate();
+            if(customAlias){
+                const existingUrl = await ShortUrl.findOne({ urlCode: customAlias });
+                if(existingUrl){
+                    return res.status(409).json('Alias already exists');
+                }
+            }
             let shortUrl = await ShortUrl.findOne({ originalUrl });
 
             if (shortUrl) {
